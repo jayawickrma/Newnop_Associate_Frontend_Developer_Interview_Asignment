@@ -58,15 +58,28 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
     }
 
     setIsSubmitting(true);
+
     try {
+      // 1️⃣ Call login API
       const response = await apiService.login(formData);
-      localStorage.setItem('token', response.token);
+
+      // 2️⃣ Save token first
+      localStorage.setItem('token', response.accessToken);
+      console.log("Token saved to localStorage:", localStorage.getItem('token'));
+
+      // 3️⃣ Update Zustand store
       setUser(response.user);
       setIsAuthenticated(true);
+      console.log("User set in store:", response.user);
+      console.log("isAuthenticated:", true);
+
+      // 4️⃣ Navigate after state is updated
       navigate('/dashboard');
+
     } catch (error: any) {
+      console.error("Login error:", error);
       setApiError(
-        error.response?.data?.message || 'Login failed. Please check your credentials.'
+          error.response?.data?.message || 'Login failed. Please check your credentials.'
       );
     } finally {
       setIsSubmitting(false);

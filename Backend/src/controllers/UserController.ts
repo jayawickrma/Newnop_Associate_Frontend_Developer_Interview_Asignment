@@ -4,26 +4,20 @@ import {User} from "../models/UserModel";
 
 class UserController{
 
-    async login(req:any,resp:any){
-        const email =req.body.email;
-        const password =req.body.password;
-
-        const user:User = {
-            email, password,
-            name: ''
-        }
-
-        try{
-            const varify_user = await user_service.findByEmail(user)
-                if(varify_user){
-                    await user_service.login(user.email,user.password)
-                }
-            resp.status(200).send('Login Success');
-        }catch (e:any){
-            console.error(e);
-            resp.status(500).error(e.message);
+    async login(req: any, res: any) {
+        const { email, password } = req.body;
+        console.log(req.body);
+        console.log("email :", email);
+        console.log("password :", password);
+        try {
+            const result = await user_service.login(email, password);
+            console.log(result.accessToken);
+            return res.status(200).json(result);
+        } catch (e: any) {
+            return res.status(401).json({ message: e.message });
         }
     }
+
 
     async signUp(req:any,resp:any){
         const user:User =req.body;
@@ -33,6 +27,25 @@ class UserController{
         }catch (e:any){
             console.log(e)
             resp.status(500).error(e.message);
+        }
+    }
+
+    async getCurrentUser(req: any, res: any) {
+        try {
+            const userId = req.user.id;
+            const user = await user_service.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            return res.status(200).json({
+                id: user.id,
+                email: user.email,
+                name: user.name,
+            });
+        } catch (err: any) {
+            console.error(err);
+            return res.status(500).json({ message: "Failed to fetch user" });
         }
     }
 }

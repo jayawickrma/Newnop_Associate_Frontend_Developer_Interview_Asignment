@@ -11,7 +11,7 @@ import type {
   IssuesResponse,
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
 class ApiService {
   private api: AxiosInstance;
@@ -52,11 +52,16 @@ class ApiService {
   // Auth endpoints
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const { data } = await this.api.post<AuthResponse>('/auth/login', credentials);
+
+    // Save token
+    localStorage.setItem('token', data.accessToken);
+    console.log("Frontend API response:", data); // 🔥 add this
     return data;
   }
 
+
   async register(userData: RegisterData): Promise<AuthResponse> {
-    const { data } = await this.api.post<AuthResponse>('/auth/register', userData);
+    const { data } = await this.api.post<AuthResponse>('/auth/signUp', userData);
     return data;
   }
 
