@@ -2,6 +2,7 @@ import express from 'express';
 const app =express();
 import dotenv = require('dotenv');
 import cors from 'cors';
+import main_route from "./routes/MainRoute";
 
 dotenv.config();
 app.use(express.json());
@@ -13,7 +14,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type','Authorization'],
     credentials: true,
 }));
-// app.use('/api/v1',mainRouter.router)
+app.use('/api/v1',main_route.router)
 
 
 const PORT = process.env.PORT || 8080;
