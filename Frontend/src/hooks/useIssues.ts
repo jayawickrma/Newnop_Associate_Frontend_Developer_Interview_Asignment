@@ -1,7 +1,7 @@
-import {  useCallback } from 'react';
+import { useCallback } from 'react';
 import { useIssueStore } from '../stores/store';
 import { apiService } from '../services/api';
-import type { CreateIssueDTO, IssueFilters } from '../types';
+import type { CreateIssueDTO   } from '../types';
 
 export const useIssues = () => {
   const {
@@ -20,19 +20,20 @@ export const useIssues = () => {
     setError,
   } = useIssueStore();
 
-  const fetchIssues = useCallback(async (customFilters?: IssueFilters) => {
+  const fetchIssues = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getAllIssues(customFilters || filters);
+      const response = await apiService.getAllIssues();
       setIssues(response.issues);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch issues');
       console.error('Error fetching issues:', err);
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [filters, setIssues, setLoading, setError]);
+  }, [setIssues, setLoading, setError]);
 
   const createIssue = useCallback(async (issueData: CreateIssueDTO) => {
     setLoading(true);
@@ -40,6 +41,7 @@ export const useIssues = () => {
     try {
       const newIssue = await apiService.createIssue(issueData);
       addIssue(newIssue);
+      fetchIssues();
       return newIssue;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create issue');
@@ -56,6 +58,7 @@ export const useIssues = () => {
     try {
       const updated = await apiService.updateIssue(id, issueData);
       updateIssue(id, updated);
+      fetchIssues();
       return updated;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update issue');
@@ -84,19 +87,23 @@ export const useIssues = () => {
   const exportToCSV = useCallback(async () => {
     try {
       const blob = await apiService.exportIssuesCSV(filters);
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
+
       a.href = url;
       a.download = `issues-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+
       document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to export issues');
       console.error('Error exporting issues:', err);
+      throw err; // ✅ IMPORTANT
     }
-  }, [filters, setError]);
+  }, [filters]);
+
 
   return {
     issues,

@@ -6,11 +6,12 @@ class IssuesRoutes {
 
     constructor() {
         this.router = Router();
-        this.router.use('/issues', issue_controller.getAllIssues);
-        this.router.use('/get-issue', issue_controller.getIssue);
-        this.router.use('/delete-issues', issue_controller.deleteIssue);
-        this.router.use('/update-issue', issue_controller.updateIssue);
-        this.router.use('/create-issue', issue_controller.saveIssue)
+        this.router.get('/issues', issue_controller.getAllIssues);
+        this.router.get('/get-issue', issue_controller.getIssue);
+        this.router.delete('/delete-issues/:id', issue_controller.deleteIssue);
+        this.router.put('/update-issue/:id', issue_controller.updateIssue);
+        this.router.post('/create-issue', issue_controller.saveIssue);
+        this.router.get('/export/csv', issue_controller.exportIssuesCSV)
     }
 }
 
