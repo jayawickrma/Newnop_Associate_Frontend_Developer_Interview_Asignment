@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "Issue Tracker Backend API",
   "main": "dist/server.js",
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
-    "prisma:push": "prisma db push --schema=./prisma/schema.prisma"
+    "prisma:generate": "prisma generate --schema=./src/prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema=./src/prisma/schema.prisma"
   },
   "keywords": [],
   "author": "",
