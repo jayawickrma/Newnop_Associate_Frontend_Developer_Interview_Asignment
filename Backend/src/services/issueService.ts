@@ -26,9 +26,24 @@ class IssueService{
 
     }
 
-    async updateIssue(issue: Issue, id: Issue){
+    async updateIssue( id: string,issue: Issue){
         try{
-
+            const update = await prisma.issue.update({
+                where:{
+                    id:id
+                },
+                data:{
+                    title :issue.title,
+                    description:issue.description,
+                    status:issue.status,
+                    priority:issue.priority,
+                    severity:issue.severity,
+                    updatedAt: new Date()
+                }
+            })
+            if(update){
+                return "Issue Updated Successfully"
+            }
         }catch (error){
             console.log(error);
             return "Failed to update Issue...";

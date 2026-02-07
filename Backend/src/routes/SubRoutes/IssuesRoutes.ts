@@ -9,7 +9,7 @@ class IssuesRoutes {
         this.router.get('/issues', issue_controller.getAllIssues);
         this.router.get('/get-issue', issue_controller.getIssue);
         this.router.delete('/delete-issues/:id', issue_controller.deleteIssue);
-        this.router.put('/update-issue', issue_controller.updateIssue);
+        this.router.put('/update-issue/:id', issue_controller.updateIssue);
         this.router.post('/create-issue', issue_controller.saveIssue)
     }
 }

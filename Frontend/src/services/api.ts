@@ -86,7 +86,7 @@ class ApiService {
   }
 
   async updateIssue(id: string, issueData: Partial<CreateIssueDTO>): Promise<Issue> {
-    const { data } = await this.api.put<Issue>(`/issue/issues/${id}`, issueData); // ✅ Fixed: was using backticks as template literal
+    const { data } = await this.api.put<Issue>(`/issue/update-issue/${id}`, issueData); // ✅ Fixed: was using backticks as template literal
     return data;
   }
 

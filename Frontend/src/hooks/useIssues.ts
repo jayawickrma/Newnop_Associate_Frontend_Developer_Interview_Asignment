@@ -58,6 +58,7 @@ export const useIssues = () => {
     try {
       const updated = await apiService.updateIssue(id, issueData);
       updateIssue(id, updated);
+      fetchIssues();
       return updated;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update issue');

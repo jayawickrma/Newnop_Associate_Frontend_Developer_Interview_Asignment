@@ -45,7 +45,7 @@ class IssuesController {
     }
 
     async updateIssue(req:any ,resp:any){
-        const id = req.query['id'];
+        const id = req.params.id;
         const issue : Issue = req.body;
         try{
             await issue_service.updateIssue(id,issue)
