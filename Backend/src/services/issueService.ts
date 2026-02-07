@@ -1,90 +1,85 @@
-import {Issue} from "../models/IssueModel";
-import prisma from "../../prisma/Client";
+import { PrismaClient } from "@prisma/client";
+import { Issue } from "../models/IssueModel";
 
-class IssueService{
-    async createIssue(issue:Issue){
-        try{
+const prisma = new PrismaClient();
+
+class IssueService {
+    async createIssue(issue: Issue) {
+        try {
             const create = await prisma.issue.create({
-                data:{
-                    title :issue.title,
-                    description:issue.description,
-                    status:issue.status,
-                    priority:issue.priority,
-                    severity:issue.severity,
+                data: {
+                    title: issue.title,
+                    description: issue.description,
+                    status: issue.status || "OPEN",
+                    priority: issue.priority || "MEDIUM",
+                    severity: issue.severity || "MINOR",
                     createdAt: new Date(),
                     updatedAt: new Date()
                 }
-            })
-            if(create){
-                return "Issue Created Successfully"
-            }
-
-        }catch (error){
+            });
+            return create;
+        } catch (error) {
             console.log(error);
-            return "Failed to create Issue...";
+            throw new Error("Failed to create Issue");
         }
-
     }
 
-    async updateIssue( id: string,issue: Issue){
-        try{
+    async updateIssue(id: string, issue: Partial<Issue>) {
+        try {
             const update = await prisma.issue.update({
-                where:{
-                    id:id
-                },
-                data:{
-                    title :issue.title,
-                    description:issue.description,
-                    status:issue.status,
-                    priority:issue.priority,
-                    severity:issue.severity,
+                where: { id: id },
+                data: {
+                    ...(issue.title && { title: issue.title }),
+                    ...(issue.description && { description: issue.description }),
+                    ...(issue.status && { status: issue.status }),
+                    ...(issue.priority && { priority: issue.priority }),
+                    ...(issue.severity && { severity: issue.severity }),
                     updatedAt: new Date()
                 }
-            })
-            if(update){
-                return "Issue Updated Successfully"
-            }
-        }catch (error){
+            });
+            return update;
+        } catch (error) {
             console.log(error);
-            return "Failed to update Issue...";
+            throw new Error("Failed to update Issue");
         }
     }
 
-    async deleteIssue(id:string){
-        try{
+    async deleteIssue(id: string) {
+        try {
             await prisma.issue.delete({
-                where:{id:id}
-            })
+                where: { id: id }
+            });
             console.log("Successfully deleted Issue...");
-            return "Successfully deleted Issue...";
-        }catch (error){
+            return { message: "Successfully deleted Issue" };
+        } catch (error) {
             console.log(error);
-            return "Failed to delete Issue...";
+            throw new Error("Failed to delete Issue");
         }
     }
 
-    async getIssueById(id:string){
-        try{
-            const issue =await prisma.issue.findUnique({
-                where: {id:id}
-            })
-            console.log("Successfully getting Issue...",issue);
+    async getIssueById(id: string) {
+        try {
+            const issue = await prisma.issue.findUnique({
+                where: { id: id }
+            });
+            console.log("Successfully getting Issue...", issue);
             return issue;
-
-        }catch (error){
+        } catch (error) {
             console.log(error);
-            return "Failed to get Issue...";
+            throw new Error("Failed to get Issue");
         }
     }
 
     async getAllIssues() {
         try {
-            const issues = await prisma.issue.findMany();
+            const issues = await prisma.issue.findMany({
+                orderBy: { createdAt: 'desc' }
+            });
             console.log("Successfully getting All Issues...", issues);
             return issues;
         } catch (error) {
             console.log(error);
-            throw new Error("Failed to get Issues...");
+            throw new Error("Failed to get Issues");
         }
     }
 
@@ -93,7 +88,7 @@ class IssueService{
             const where: any = {};
 
             if (filters.status && filters.status !== 'all') {
-                where.status = filters.status.toUpperCase(); // Prisma enums are uppercase
+                where.status = filters.status.toUpperCase();
             }
 
             if (filters.priority && filters.priority !== 'all') {
@@ -116,5 +111,6 @@ class IssueService{
         }
     }
 }
+
 const issue_service = new IssueService();
 export default issue_service;
