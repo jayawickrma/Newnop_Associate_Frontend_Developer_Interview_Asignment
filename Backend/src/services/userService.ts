@@ -1,5 +1,5 @@
 import { User } from "../models/UserModel";
-import prisma from "../../prisma/Client";
+import prisma from "../prisma/Client";
 import jwt, { Secret } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
