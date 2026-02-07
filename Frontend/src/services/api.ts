@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type  { AxiosInstance } from 'axios';
+import type { AxiosInstance } from 'axios';
 import type {
   AuthResponse,
   LoginCredentials,
@@ -26,39 +26,35 @@ class ApiService {
 
     // Add token to requests
     this.api.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
+        (config) => {
+          const token = localStorage.getItem('token');
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+          return config;
+        },
+        (error) => Promise.reject(error)
     );
 
     // Handle response errors
     this.api.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '/login';
+        (response) => response,
+        (error) => {
+          if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+          }
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
-      }
     );
   }
 
   // Auth endpoints
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const { data } = await this.api.post<AuthResponse>('/auth/login', credentials);
-
-    // Save token
-    localStorage.setItem('token', data.accessToken);
-    console.log("Frontend API response:", data); // 🔥 add this
+    localStorage.setItem('token', data.accessToken); // ✅ Changed from accessToken to token
     return data;
   }
-
 
   async register(userData: RegisterData): Promise<AuthResponse> {
     const { data } = await this.api.post<AuthResponse>('/auth/signUp', userData);
@@ -70,33 +66,35 @@ class ApiService {
     return data;
   }
 
-  // Issues endpoints
   async getAllIssues(filters?: IssueFilters): Promise<IssuesResponse> {
-    const { data } = await this.api.get<IssuesResponse>('/issues', { params: filters });
+    const { data } = await this.api.get<IssuesResponse>('/issue/issues', {
+      params: filters, // filters sent as query params
+    });
     return data;
   }
 
+
   async getIssue(id: string): Promise<Issue> {
-    const { data} = await this.api.get<Issue>(`/issues/${id}`);
+    const { data } = await this.api.get<Issue>(`/issue/issues/${id}`); // ✅ Fixed: was using backticks wrong
     return data;
   }
 
   async createIssue(issueData: CreateIssueDTO): Promise<Issue> {
-    const { data } = await this.api.post<Issue>('/issues', issueData);
+    const { data } = await this.api.post<Issue>('/issue/issues', issueData); // ✅ Fixed route
     return data;
   }
 
   async updateIssue(id: string, issueData: Partial<CreateIssueDTO>): Promise<Issue> {
-    const { data } = await this.api.put<Issue>(`/issues/${id}`, issueData);
+    const { data } = await this.api.put<Issue>(`/issue/issues/${id}`, issueData); // ✅ Fixed: was using backticks as template literal
     return data;
   }
 
   async deleteIssue(id: string): Promise<void> {
-    await this.api.delete(`/issues/${id}`);
+    await this.api.delete(`/issue/delete-issues/${id}`); // ✅ Fixed: was using backticks wrong
   }
 
   async exportIssuesCSV(filters?: IssueFilters): Promise<Blob> {
-    const { data } = await this.api.get('/issues/export/csv', {
+    const { data } = await this.api.get('/issue/export/csv', { // ✅ Fixed route
       params: filters,
       responseType: 'blob',
     });

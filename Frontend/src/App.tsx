@@ -6,41 +6,49 @@ import Dashboard from './pages/Dashboard';
 import { useAuthStore } from './stores/store';
 import './styles/App.css';
 
-interface PrivateRouteProps {
-    children: React.ReactNode;
-}
-
 function App() {
-    const { isAuthenticated } = useAuthStore();
+    const { isAuthenticated, checkAuth } = useAuthStore();
     const [authChecked, setAuthChecked] = useState(false);
 
     useEffect(() => {
-        // Check authentication status on mount
+        // Check authentication status on mount (for page reloads)
+        checkAuth();
         setAuthChecked(true);
-    }, []);
+    }, [checkAuth]);
 
-    const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-        if (!authChecked) {
-            return <div className="loading-screen">Loading...</div>;
-        }
-        return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
-    };
+    // Show loading screen while checking auth
+    if (!authChecked) {
+        return (
+            <div className="loading-screen">
+                <div className="spinner"></div>
+                <p>Loading...</p>
+            </div>
+        );
+    }
 
     return (
         <Router>
             <Routes>
-                <Route path="/login" element={<Login setIsAuthenticated={() => {}} />} />
-                <Route path="/register" element={<Register />} />
+                <Route
+                    path="/login"
+                    element={
+                        isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+                    }
+                />
+                <Route
+                    path="/register"
+                    element={
+                        isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />
+                    }
+                />
                 <Route
                     path="/dashboard"
                     element={
-                        <PrivateRoute>
-                            <Dashboard setIsAuthenticated={() => {}} />
-                        </PrivateRoute>
+                        isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />
                     }
                 />
-                <Route path="/" element={<Navigate to="/dashboard" />} />
-                <Route path="*" element={<Navigate to="/dashboard" />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
         </Router>
     );

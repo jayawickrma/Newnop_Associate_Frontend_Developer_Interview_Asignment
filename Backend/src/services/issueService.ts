@@ -49,15 +49,14 @@ class IssueService{
         }
     }
 
-    async getAllIssues(){
-        try{
-            const issues =await prisma.issue.findMany()
-            console.log("Successfully getting All Issues...",issues);
-            return issues;
-
-        }catch (error){
+    async getAllIssues() {
+        try {
+            const issues = await prisma.issue.findMany();
+            console.log("Successfully getting All Issues...", issues);
+            return issues; // ✅ Always return array
+        } catch (error) {
             console.log(error);
-            return "Failed to get Issues...";
+            throw new Error("Failed to get Issues..."); // ✅ Throw error instead of returning string
         }
     }
 }

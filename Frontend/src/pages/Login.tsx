@@ -4,19 +4,15 @@ import { LogIn, Mail, Lock } from 'lucide-react';
 import { apiService } from '../services/api';
 import { useAuthStore } from '../stores/store';
 
-interface LoginProps {
-  setIsAuthenticated: (value: boolean) => void;
-}
-
-const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -60,20 +56,13 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
     setIsSubmitting(true);
 
     try {
-      // 1️⃣ Call login API
+      // Call login API
       const response = await apiService.login(formData);
 
-      // 2️⃣ Save token first
-      localStorage.setItem('token', response.accessToken);
-      console.log("Token saved to localStorage:", localStorage.getItem('token'));
-
-      // 3️⃣ Update Zustand store
+      // Update Zustand store (this sets isAuthenticated to true)
       setUser(response.user);
-      setIsAuthenticated(true);
-      console.log("User set in store:", response.user);
-      console.log("isAuthenticated:", true);
 
-      // 4️⃣ Navigate after state is updated
+      // Navigate to dashboard
       navigate('/dashboard');
 
     } catch (error: any) {
@@ -87,74 +76,74 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <div className="auth-icon">
-            <LogIn size={32} />
-          </div>
-          <h1>Welcome Back</h1>
-          <p>Sign in to your Issue Tracker account</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          {apiError && (
-            <div className="error-banner">
-              {apiError}
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="auth-icon">
+              <LogIn size={32} />
             </div>
-          )}
-
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <div className="input-with-icon">
-              <Mail size={18} className="input-icon" />
-              <input
-                type="email"
-                name="email"
-                className={`form-input ${errors.email ? 'error' : ''}`}
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-              />
-            </div>
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            <h1>Welcome Back</h1>
+            <p>Sign in to your Issue Tracker account</p>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <div className="input-with-icon">
-              <Lock size={18} className="input-icon" />
-              <input
-                type="password"
-                name="password"
-                className={`form-input ${errors.password ? 'error' : ''}`}
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-              />
+          <form onSubmit={handleSubmit} className="auth-form">
+            {apiError && (
+                <div className="error-banner">
+                  {apiError}
+                </div>
+            )}
+
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <div className="input-with-icon">
+                <Mail size={18} className="input-icon" />
+                <input
+                    type="email"
+                    name="email"
+                    className={`form-input ${errors.email ? 'error' : ''}`}
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                />
+              </div>
+              {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
-            {errors.password && <span className="error-message">{errors.password}</span>}
+
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <div className="input-with-icon">
+                <Lock size={18} className="input-icon" />
+                <input
+                    type="password"
+                    name="password"
+                    className={`form-input ${errors.password ? 'error' : ''}`}
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
+                />
+              </div>
+              {errors.password && <span className="error-message">{errors.password}</span>}
+            </div>
+
+            <button
+                type="submit"
+                className="btn-primary btn-block"
+                disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            <p>
+              Don't have an account?{' '}
+              <Link to="/register" className="auth-link">
+                Sign up
+              </Link>
+            </p>
           </div>
-
-          <button
-            type="submit"
-            className="btn-primary btn-block"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="auth-footer">
-          <p>
-            Don't have an account?{' '}
-            <Link to="/register" className="auth-link">
-              Sign up
-            </Link>
-          </p>
         </div>
       </div>
-    </div>
   );
 };
 

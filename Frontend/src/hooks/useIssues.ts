@@ -1,7 +1,7 @@
-import {  useCallback } from 'react';
+import { useCallback } from 'react';
 import { useIssueStore } from '../stores/store';
 import { apiService } from '../services/api';
-import type { CreateIssueDTO, IssueFilters } from '../types';
+import type { CreateIssueDTO   } from '../types';
 
 export const useIssues = () => {
   const {
@@ -20,19 +20,20 @@ export const useIssues = () => {
     setError,
   } = useIssueStore();
 
-  const fetchIssues = useCallback(async (customFilters?: IssueFilters) => {
+  const fetchIssues = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getAllIssues(customFilters || filters);
+      const response = await apiService.getAllIssues();
       setIssues(response.issues);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch issues');
       console.error('Error fetching issues:', err);
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [filters, setIssues, setLoading, setError]);
+  }, [setIssues, setLoading, setError]);
 
   const createIssue = useCallback(async (issueData: CreateIssueDTO) => {
     setLoading(true);

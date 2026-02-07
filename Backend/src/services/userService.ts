@@ -71,7 +71,7 @@ class UserService {
             const existingUser = await prisma.user.findUnique({
                 where: { email }
             });
-            console.log("existingUser:", existingUser); // 🔥 Add this
+            console.log("existingUser:", existingUser);
             return existingUser;
         } catch (err) {
             console.error(err);

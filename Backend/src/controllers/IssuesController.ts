@@ -1,5 +1,6 @@
 import {Issue} from "../models/IssueModel";
 import issue_service from "../services/issueService";
+import prisma from "../../prisma/Client";
 
 class IssuesController {
 
@@ -49,15 +50,57 @@ class IssuesController {
         }
     }
 
-    async getAllIssues(req:any ,resp:any){
-        try{
-            const issues = await issue_service.getAllIssues();
-            return resp.status(200).send(issues);
-        }catch (err:any){
-            console.log(err);
-            resp.status(500).send(err.message);
+    async getAllIssues(req: any, resp: any) {
+        try {
+            const { search, status, priority, page = 1, limit = 10 } = req.query;
+
+            // Build filter object
+            const where: any = {};
+            if (search) {
+                where.OR = [
+                    { title: { contains: search, mode: 'insensitive' } },
+                    { description: { contains: search, mode: 'insensitive' } },
+                ];
+            }
+            if (status && status !== 'all') where.status = status.toLowerCase();
+            if (priority && priority !== 'all') where.priority = priority.toLowerCase();
+
+            const total = await prisma.issue.count({ where });
+
+            const issues = await prisma.issue.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip: (parseInt(page) - 1) * parseInt(limit),
+                take: parseInt(limit),
+            });
+
+            const formattedIssues = issues.map((issue: any) => ({
+                id: issue.id,
+                title: issue.title,
+                description: issue.description,
+                status: issue.status.toLowerCase().replace('_', '-'),
+                priority: issue.priority.toLowerCase(),
+                severity: issue.severity.toLowerCase(),
+                userId: issue.userId,
+                createdAt: issue.createdAt,
+                updatedAt: issue.updatedAt,
+            }));
+
+            return resp.status(200).json({
+                issues: formattedIssues,
+                meta: {
+                    total,
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    totalPages: Math.ceil(total / parseInt(limit)),
+                },
+            });
+        } catch (err: any) {
+            console.error(err);
+            return resp.status(500).json({ message: err.message });
         }
     }
+
 }
 const issue_controller = new IssuesController()
 export default issue_controller;

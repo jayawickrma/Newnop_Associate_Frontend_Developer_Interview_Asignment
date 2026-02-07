@@ -32,22 +32,28 @@ class UserController{
 
     async getCurrentUser(req: any, res: any) {
         try {
-            const userId = req.user.id;
-            const user = await user_service.findById(userId);
+            if (!req.user || !req.user.id) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
+            const user = await user_service.findById(req.user.id);
+
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            return res.status(200).json({
+            res.json({
                 id: user.id,
                 email: user.email,
                 name: user.name,
             });
-        } catch (err: any) {
-            console.error(err);
-            return res.status(500).json({ message: "Failed to fetch user" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Failed to fetch user" });
         }
     }
+
+
 }
 const user_controller = new UserController();
 export default user_controller;
