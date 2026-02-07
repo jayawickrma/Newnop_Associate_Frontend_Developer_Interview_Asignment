@@ -87,19 +87,23 @@ export const useIssues = () => {
   const exportToCSV = useCallback(async () => {
     try {
       const blob = await apiService.exportIssuesCSV(filters);
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
+
       a.href = url;
       a.download = `issues-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+
       document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to export issues');
       console.error('Error exporting issues:', err);
+      throw err; // ✅ IMPORTANT
     }
-  }, [filters, setError]);
+  }, [filters]);
+
 
   return {
     issues,

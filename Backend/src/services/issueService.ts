@@ -87,6 +87,34 @@ class IssueService{
             throw new Error("Failed to get Issues...");
         }
     }
+
+    async getAllIssuesForExport(filters: any = {}) {
+        try {
+            const where: any = {};
+
+            if (filters.status && filters.status !== 'all') {
+                where.status = filters.status.toUpperCase(); // Prisma enums are uppercase
+            }
+
+            if (filters.priority && filters.priority !== 'all') {
+                where.priority = filters.priority.toUpperCase();
+            }
+
+            if (filters.severity && filters.severity !== 'all') {
+                where.severity = filters.severity.toUpperCase();
+            }
+
+            const issues = await prisma.issue.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+            });
+
+            return issues;
+        } catch (error) {
+            console.error('Failed to get Issues for export:', error);
+            throw new Error('Failed to get Issues for export');
+        }
+    }
 }
 const issue_service = new IssueService();
 export default issue_service;

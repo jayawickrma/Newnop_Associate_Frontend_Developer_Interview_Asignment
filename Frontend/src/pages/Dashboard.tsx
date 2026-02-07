@@ -152,12 +152,15 @@ const Dashboard: React.FC = () => {
       setProcessingAction('Exporting to CSV...');
       await exportToCSV();
       showSuccess('CSV exported successfully!');
-    } catch (error) {
-      showError('Failed to export CSV');
+    } catch (error: any) {
+      showError(
+          error?.response?.data?.message || 'Failed to export CSV'
+      );
     } finally {
       setProcessingAction(null);
     }
   };
+
 
   // Pagination
   const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);

@@ -10,7 +10,8 @@ class IssuesRoutes {
         this.router.get('/get-issue', issue_controller.getIssue);
         this.router.delete('/delete-issues/:id', issue_controller.deleteIssue);
         this.router.put('/update-issue/:id', issue_controller.updateIssue);
-        this.router.post('/create-issue', issue_controller.saveIssue)
+        this.router.post('/create-issue', issue_controller.saveIssue);
+        this.router.get('/export/csv', issue_controller.exportIssuesCSV)
     }
 }
 
