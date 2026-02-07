@@ -1,5 +1,5 @@
 import {Issue} from "../models/IssueModel";
-import prisma from "../prisma/Client";
+import prisma from "../../prisma/Client";
 
 class IssueService{
     async createIssue(issue:Issue){
