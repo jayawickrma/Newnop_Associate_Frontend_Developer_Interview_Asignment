@@ -1,13 +1,15 @@
 import { User } from "../models/UserModel";
-import prisma from "../../prisma/Client";
 import jwt, { Secret } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 class UserService {
 
     async login(email: string, password: string) {
 
-        const user = await this.findByEmail(email); // pass only email
+        const user = await this.findByEmail(email);
 
         if (!user) {
             throw new Error("User not found");
@@ -30,7 +32,6 @@ class UserService {
             { expiresIn: "7d" }
         );
 
-
         return {
             accessToken,
             refreshToken,
@@ -41,9 +42,6 @@ class UserService {
             },
         };
     }
-
-
-
 
     async register(user: User) {
         const hashedPw = await bcrypt.hash(user.password, 10);
@@ -65,7 +63,6 @@ class UserService {
         }
     }
 
-
     async findByEmail(email: string) {
         try {
             const existingUser = await prisma.user.findUnique({
@@ -79,7 +76,6 @@ class UserService {
         }
     }
 
-
     async findById(id: string) {
         try {
             const user = await prisma.user.findUnique({
@@ -91,9 +87,6 @@ class UserService {
             return null;
         }
     }
-
-
-
 }
 
 const userService = new UserService();
