@@ -11,7 +11,7 @@ import type {
   IssuesResponse,
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://newnop-associate-frontend-developer.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://newnop-associate-frontend-developer.onrender.com/api/v1';
 class ApiService {
   private api: AxiosInstance;
 
