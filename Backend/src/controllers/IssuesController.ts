@@ -1,12 +1,12 @@
 import {Issue} from "../models/IssueModel";
 import issue_service from "../services/issueService";
-import prisma from "../../prisma/Client";
 
 class IssuesController {
 
     async saveIssue(req:any ,resp:any){
 
         const issue : Issue = req.body;
+        console.log("Create issue Data :",issue);
         try{
             await issue_service.createIssue(issue);
             return resp.status(201).send({"message":"Successfully created issue"});
@@ -17,7 +17,13 @@ class IssuesController {
     }
 
     async deleteIssue(req:any ,resp:any){
-        const id  =  req.query['id'];
+        const id  =  req.params.id;
+        console.log("delete by id : ",id)
+        if (!id || id === 'undefined') {
+            return resp.status(400).json({
+                message: "Invalid issue ID"
+            });
+        }
         try{
             await issue_service.deleteIssue(id);
             return resp.status(200).send({"message":"Successfully deleted issue"});
@@ -52,27 +58,8 @@ class IssuesController {
 
     async getAllIssues(req: any, resp: any) {
         try {
-            const { search, status, priority, page = 1, limit = 10 } = req.query;
+            const issues = await issue_service.getAllIssues();
 
-            // Build filter object
-            const where: any = {};
-            if (search) {
-                where.OR = [
-                    { title: { contains: search, mode: 'insensitive' } },
-                    { description: { contains: search, mode: 'insensitive' } },
-                ];
-            }
-            if (status && status !== 'all') where.status = status.toLowerCase();
-            if (priority && priority !== 'all') where.priority = priority.toLowerCase();
-
-            const total = await prisma.issue.count({ where });
-
-            const issues = await prisma.issue.findMany({
-                where,
-                orderBy: { createdAt: 'desc' },
-                skip: (parseInt(page) - 1) * parseInt(limit),
-                take: parseInt(limit),
-            });
 
             const formattedIssues = issues.map((issue: any) => ({
                 id: issue.id,
@@ -89,18 +76,17 @@ class IssuesController {
             return resp.status(200).json({
                 issues: formattedIssues,
                 meta: {
-                    total,
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    totalPages: Math.ceil(total / parseInt(limit)),
-                },
+                    total: formattedIssues.length,
+                    page: 1,
+                    limit: formattedIssues.length,
+                    totalPages: 1
+                }
             });
         } catch (err: any) {
-            console.error(err);
+            console.log(err);
             return resp.status(500).json({ message: err.message });
         }
     }
-
 }
 const issue_controller = new IssuesController()
 export default issue_controller;

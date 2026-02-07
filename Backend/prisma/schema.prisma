@@ -27,12 +27,12 @@ model User {
 
 // Issue Model
 model Issue {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
-  status      Status   @default(OPEN)
-  priority    Priority @default(MEDIUM)
-  severity    Severity @default(MINOR)
+  status      String
+  priority    String
+  severity    String
 
   // Relations
   userId String? @db.ObjectId

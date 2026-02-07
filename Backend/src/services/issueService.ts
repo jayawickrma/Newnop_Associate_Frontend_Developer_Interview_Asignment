@@ -4,7 +4,20 @@ import prisma from "../../prisma/Client";
 class IssueService{
     async createIssue(issue:Issue){
         try{
-
+            const create = await prisma.issue.create({
+                data:{
+                    title :issue.title,
+                    description:issue.description,
+                    status:issue.status,
+                    priority:issue.priority,
+                    severity:issue.severity,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            })
+            if(create){
+                return "Issue Created Successfully"
+            }
 
         }catch (error){
             console.log(error);
@@ -53,10 +66,10 @@ class IssueService{
         try {
             const issues = await prisma.issue.findMany();
             console.log("Successfully getting All Issues...", issues);
-            return issues; // ✅ Always return array
+            return issues;
         } catch (error) {
             console.log(error);
-            throw new Error("Failed to get Issues..."); // ✅ Throw error instead of returning string
+            throw new Error("Failed to get Issues...");
         }
     }
 }

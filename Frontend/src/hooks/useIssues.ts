@@ -41,6 +41,7 @@ export const useIssues = () => {
     try {
       const newIssue = await apiService.createIssue(issueData);
       addIssue(newIssue);
+      fetchIssues();
       return newIssue;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create issue');

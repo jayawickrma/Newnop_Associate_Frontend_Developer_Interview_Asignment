@@ -80,7 +80,8 @@ class ApiService {
   }
 
   async createIssue(issueData: CreateIssueDTO): Promise<Issue> {
-    const { data } = await this.api.post<Issue>('/issue/issues', issueData); // ✅ Fixed route
+    const { data } = await this.api.post<Issue>('/issue/create-issue', issueData);
+    console.log(issueData);
     return data;
   }
 
@@ -90,7 +91,8 @@ class ApiService {
   }
 
   async deleteIssue(id: string): Promise<void> {
-    await this.api.delete(`/issue/delete-issues/${id}`); // ✅ Fixed: was using backticks wrong
+    console.log('Id : ' ,id)
+    await this.api.delete(`/issue/delete-issues/${id}`);
   }
 
   async exportIssuesCSV(filters?: IssueFilters): Promise<Blob> {
